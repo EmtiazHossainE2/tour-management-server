@@ -12,7 +12,7 @@ app.use(errorMiddleware)
 const tourRoute = require('./routes/v1/tour.route.js')
 
 // Use v1 Api
-app.use('/api/v1/tours' , tourRoute)
+app.use('/api/v1/' , tourRoute)
 
 
 app.get("/", (req, res) => {

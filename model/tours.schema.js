@@ -1,62 +1,60 @@
 const mongoose = require('mongoose');
 
-const toursSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Please Provide a Tour Name'],
-      trim: true,
-      unique: [true, 'Tour name must be unique'],
-      minLength: [3, 'Tour name must be at least 3 characters'],
-      maxLength: [100, 'Tour name is too large'],
-    },
-
-    description: {
-      type: String,
-      required: [true, 'Please provide a description'],
-    },
-
-    image: String,
-
-    price: {
-      type: Number,
-      required: [true, 'Please provide price '],
-      min: [0, 'Price can not be negative'],
-    },
-
-    visitor: {
-      type: Number,
-      required: true,
-      min: [0, 'Visitor can not be negative'],
-      validate: {
-        validator: (value) => {
-          const isInteger = Number.isInteger(value);
-          if (isInteger) {
-            return true;
-          } else {
-            return false;
-          }
-        },
-      },
-      message: 'Visitor must be an integer',
-    },
-
-    viewCount: {
-      type: Number,
-      default: 0,
-      required: true,
-    },
-
-    status: {
-      type: String,
-      required: true,
-      default: 'book-now',
-      enum: {
-        values: ['book-now', 'wish-list'],
-        message: `Status value can't be {VALUE}, must be book-now/wish-list`,
-      },
+const toursSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Please enter tour name"],
+    trim: true,
+    maxLength: [100, "Tour name cannot exceed 100 characters"],
+    minLength: [3, "Tour name cannot be less than 3 characters"],
+    unique: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+    validate: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
+  },
+  price: {
+    type: Number,
+    required: true,
+    minLength: [0, "Price cannot be less than 0"],
+  },
+  duration: {
+    type: Number,
+    required: true,
+    min: [0, "Duration cannot be less than 0"],
+    max: [23, "Duration cannot be more than 23"],
+    validate: {
+      validator: Number.isInteger,
+      message: "{VALUE} is not an integer value",
     },
   },
+  view: {
+    type: Number,
+    default: 0,
+  },
+  maxGroupSize: {
+    type: Number,
+    required: true,
+    min: [0, "Max group size cannot be less than 0"],
+    validate: {
+      validator: Number.isInteger,
+      message: "{VALUE} is not an integer value",
+    },
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: {
+      values: ["available", "unavailable"],
+      message: "Please select the correct status for tour, it must be either available or unavailable",
+    },
+  },
+},
   {
     timestamps: true,
   }
