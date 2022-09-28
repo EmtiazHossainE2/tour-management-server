@@ -1,36 +1,60 @@
-const Tours = require('../../model/tours.schema.js');
+const Tours = require('../models/Tours');
+const asyncHandler = require('../../middleware/catchAsyncError.js');
+const ErrorHandler = require('../../utils/errorHandle.js');
+const { isValidObjectId } = require('mongoose');
 
-// Get All Tours
-exports.getAllTours = async (req, res, next) => {
+// Get All Tour
+exports.getAllTours = asyncHandler(async (req, res, next) => {
+  const fields = req.query?.fields?.split(',')?.join(' ') || '';
+  const sort = req.query?.sort?.split(',')?.join(' ') || '';
+  const { page = 1, limit = 0 } = req.query;
+
   const tours = await Tours.find()
+    .select(fields)
+    .skip((+page - 1) * +limit)
+    .limit(+limit)
+    .sort(sort);
+
+  if (!tours) {
+    res.status(400).json({
+      success: false,
+      message: 'something is wrong'
+    });
+  }
   res.status(200).json({
     success: true,
-    tours
-  })
-};
+    message: 'get all tours',
+    data: tours
+  });
+});
 
-//Create a tours
-exports.createTour = async (req, res, next) => {
+// Create A Tour
+exports.createTour = asyncHandler(async (req, res, next) => {
   const data = req.body;
   const tour = new Tours(data);
   const result = await tour.save();
 
   if (!result._id) {
-    return res.status(500).json({ success: false, error: 'internal error' });
+    return res.status(500).json({
+      success: false,
+      error: 'internal error'
+    });
   }
   res.status(201).json({ success: true, message: 'Tour Created' });
-};
+});
 
-// Get cheapest tours
-exports.getCheapest = async (req, res, next) => {
+//Get Cheapest Tours
+exports.getCheapest = asyncHandler(async (req, res, next) => {
   const cheapest = await Tours.find().sort('price').limit(3);
-  res
-    .status(200)
-    .json({ success: true, message: 'cheapest tours price', data: cheapest });
-};
+  res.status(200).json({
+    success: true,
+    message: 'cheapest tours price',
+    data: cheapest
+  });
+});
 
-// Get a tour by id
-exports.getOneTourById = async (req, res, next) => {
+//  Get A Tour By Id
+exports.getOneTourById = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const result = await Tours.findById(id);
   const incViewCont = await Tours.updateOne(
@@ -40,24 +64,28 @@ exports.getOneTourById = async (req, res, next) => {
   if (!result || !isValidObjectId(id) || !incViewCont.acknowledged) {
     return res.status(400).json({ success: false, message: 'no data found' });
   }
-  res
-    .status(200)
-    .json({ success: true, message: 'get tour details by id', data: result });
-};
+  res.status(200).json({
+    success: true,
+    message: 'get tour details by id',
+    data: result
+  });
+});
 
-// Get all trending tours
-exports.getTrending = async (req, res, next) => {
+// Get All Trending Tours
+exports.getTrending = asyncHandler(async (req, res, next) => {
   const trending = await Tours.find({}).sort('-viewCount').limit(3);
   if (!trending || trending.length === 0) {
-    return next(new ErrorResponse(`No data found`, 404));
+    return next(new ErrorHandler(`No data found`, 404));
   }
-  res
-    .status(200)
-    .json({ success: true, message: 'Trending tours', data: trending });
-};
+  res.status(200).json({
+    success: true,
+    message: 'Trending tours',
+    data: trending
+  });
+});
 
-// Update tours service
-exports.updateById = async (req, res, next) => {
+// Update Tour Service
+exports.updateById = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const data = req.body;
   const result = await Tours.updateOne(
@@ -70,4 +98,4 @@ exports.updateById = async (req, res, next) => {
     return res.status(400).json({ success: false, message: 'no data updated' });
   }
   res.status(200).json({ success: true, message: 'tour updated' });
-};
+});

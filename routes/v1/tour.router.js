@@ -1,7 +1,5 @@
-const express = require('express');
 const tourController = require('../../controller/v1/tour.controller.js');
-
-const router = express.Router();
+const router = require('express').Router();
 
 router
   .route('/')
@@ -13,5 +11,7 @@ router
   .get(tourController.getOneTourById)
   .patch(tourController.updateById);
 
+router.route('/trending').get(tourController.getTrending);
+router.route('/cheapest').get(tourController.getCheapest);
 
 module.exports = router;
