@@ -1,4 +1,4 @@
-const Tours = require('../models/Tours');
+const Tours = require('../../model/tours.schema.js');
 const asyncHandler = require('../../middleware/catchAsyncError.js');
 const ErrorHandler = require('../../utils/errorHandle.js');
 const { isValidObjectId } = require('mongoose');
@@ -30,17 +30,16 @@ exports.getAllTours = asyncHandler(async (req, res, next) => {
 
 // Create A Tour
 exports.createTour = asyncHandler(async (req, res, next) => {
-  const data = req.body;
-  const tour = new Tours(data);
-  const result = await tour.save();
 
-  if (!result._id) {
-    return res.status(500).json({
-      success: false,
-      error: 'internal error'
-    });
+  const result = await Tours.create(req.body);
+  if (!result) {
+    return next(new ErrorHandler("Tour Not Found", 404))
   }
-  res.status(201).json({ success: true, message: 'Tour Created' });
+  res.status(201).json({
+    message: "Tour created successfully",
+    status: 201,
+    result
+  });
 });
 
 //Get Cheapest Tours

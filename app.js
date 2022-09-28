@@ -1,35 +1,30 @@
 const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
-
 const app = express();
 
-/* Set Middle wares  */
-app.use(cors());
-app.use(express.json());
+//Middleware
+const errorMiddleware = require('./middleware/error.js')
+
+app.use(express.json())
+app.use(errorMiddleware)
 
 // Routes 
-const tourRoute = require('./routes/v1/tour.router.js')
+const tourRoute = require('./routes/v1/tour.route.js')
 
 // Use v1 Api
-app.use('/userRecord' , tourRoute)
+app.use('/api/v1/tours' , tourRoute)
 
 
-/* Testing api  */
-app.get('/', (req, res) => {
-  res.send('Server is running')
+app.get("/", (req, res) => {
+  res.send("Welcome to Tour Server");
+});
+
+app.all('*' , (req,res) => {
+  res.send('Api Not Found')
 })
 
-/* Not Found Routes */
-app.use((req, res, next) => {
-  res.status(404).send({ success: false, message: "No Route Found " });
-});
 
-/* Server Error Routes */
-app.use((err, req, res, next) => {
-  res
-    .status(500)
-    .send({ success: false, message: "Something Broken of your API" });
-});
+module.exports = app
 
-module.exports = app;
+
+

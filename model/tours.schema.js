@@ -53,7 +53,7 @@ const toursSchema = new mongoose.Schema(
       default: 'book-now',
       enum: {
         values: ['book-now', 'wish-list'],
-        message: `status value can't be ${VALUE}, must be book-now/wish-list`,
+        message: `Status value can't be {VALUE}, must be book-now/wish-list`,
       },
     },
   },
