@@ -4,6 +4,17 @@ require("dotenv").config();
 
 const app = express();
 
+/* Set Middle wares  */
+app.use(cors());
+app.use(express.json());
+
+// Routes 
+const tourRoute = require('./routes/v1/tour.router.js')
+
+// Use v1 Api
+app.use('/userRecord' , tourRoute)
+
+
 /* Testing api  */
 app.get('/', (req, res) => {
   res.send('Server is running')
