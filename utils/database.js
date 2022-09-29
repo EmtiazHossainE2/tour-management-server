@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const connectDatabase = () => {
-  mongoose.connect(process.env.MONGO_URI, {
+  mongoose.connect('mongodb+srv://tourUser1:0sAKy8d4oWpY7Zqx@cluster0.ettjiev.mongodb.net/tour-management-server?retryWrites=true&w=majority', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     }).then((data) => {
